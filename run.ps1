@@ -99,8 +99,13 @@ Switch (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdenti
 			}
 			$i++
 		}
-		Set-Acl -path ".\hosts" -AclObject (Get-Acl -Path "$([System.Environment]::SystemDirectory)\drivers\etc\hosts")
+		$ACL_Sys = Get-Acl -Path "$([System.Environment]::SystemDirectory)\drivers\etc\hosts"
+		$ACL_New = Get-Acl -Path ".\hosts"
+		Copy-Item -Path "$([System.Environment]::SystemDirectory)\drivers\etc\hosts" -Destination ".\hosts_BackUp" -Force
+		Set-Acl -path ".\hosts_BackUp" -AclObject ($ACL_New)
+		Set-Acl -path ".\hosts" -AclObject ($ACL_Sys)
 		Copy-Item -Path ".\hosts" -Destination "$([System.Environment]::SystemDirectory)\drivers\etc\hosts" -Force
+		Set-Acl -path "$([System.Environment]::SystemDirectory)\drivers\etc\hosts" -AclObject ($ACL_Sys)
 		Remove-Variable Header
 		Remove-Variable CleanFile
 		Remove-Variable i
