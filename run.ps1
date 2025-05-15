@@ -7,7 +7,7 @@ $script:MSGs = DATA { ConvertFrom-StringData -StringData @'
 5=Writing Header to file 'hosts'
 6=Grouping entries together ( 9 per row )
 7=Writing entries
-8=Entry "{0}"
+8=Entry {0}
 NoUAC=Admin Rights required. Re-execute the program with elevated permissions
 
 Yes=Yes
