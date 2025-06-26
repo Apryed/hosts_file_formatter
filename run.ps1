@@ -53,6 +53,7 @@ Switch (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdenti
 			if ($existingEntry) { $existingEntry[1] += $entry[1] } else { $HLD_Group += ,@($entry[0], @($entry[1])) }
 		}
 		$Header["Local_Def"] = $HLD_Group
+		Remove-Variable HLD_Group
 		$i = 0
 		foreach ($line in $OG_file) {
 			if ($line -match "^0\.0\.0\.0" -and $line -ne "0.0.0.0 0.0.0.0") {
@@ -65,7 +66,9 @@ Switch (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdenti
 		}
 		Write-Host $MSGs.'4'
 		$CleanFile=@()
+		$i=1
 		$FilteredFile | ForEach-Object {
+			Write-Host $([string]::Format($MSGs.'8', "$i / $($OG_file.Count) ( $( [math]::Round((($i / [math]::ceiling($OG_file.Count)) * 100),2))% )"))
 			$entry=($_.replace('`t','')).Trim()
 			if ($entry -notmatch "^[\t ]*#" -and $entry -ne "") {
 				$entry = ($entry -Split "0.0.0.0")[1].Trim()
@@ -75,9 +78,9 @@ Switch (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdenti
 					$CleanFile += $entry
 				}
 			}
+			$i++
 		}
 		Remove-Variable OG_file
-		Remove-Variable HLD_Group
 		Remove-Variable FilteredFile
 		Write-Host $MSGs.'5'
 		Out-File "hosts" -InputObject "# Title`t`t`t: $($Header["Title"]) ( $($Header["Extensions"]) )"
@@ -85,6 +88,10 @@ Switch (([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdenti
 		Out-File "hosts" -Append -InputObject $Header["Project_page"]
 		Out-File "hosts" -Append -InputObject $Header["Latest"]
 		Out-File "hosts" -Append -InputObject $Header["Personal_page"]
+		Out-File "hosts" -Append -InputObject "# ======================"
+		foreach ($entry in $Header["Local_Def"]) {
+			Out-File "hosts" -Append -InputObject "$($entry[0]) $($entry[1])"
+		}
 		Out-File "hosts" -Append -InputObject "# ======================"
 		Write-Host $MSGs.'6'
 		$i=1
